@@ -1,0 +1,126 @@
+.dropdownImmortal{
+    position:relative;
+    margin: 10px;
+
+    background: #1b1b1b;
+    width: 125px;
+    line-height: 40px;
+    padding: 4px 25px;
+    border-radius: 10px;
+    user-select: none;
+}
+
+.dropdownChoice label{
+    cursor: pointer;
+    color:white;
+    display: block;
+}
+
+.dropdownImmortal label{
+    font-size:30px;    
+}
+
+.dropdownChoice label:hover{
+    color:bisque;
+}
+
+.arrow {
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+}
+
+.down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+}
+
+.button span{
+    float:right;
+    position:absolute;
+    left:85%;
+    top:18px;
+}
+
+.action_header .down{
+    /* border: solid black; */
+    border-width: 0 3px 3px 0;
+    margin: 2px;
+}
+
+.dropdownChoice .menu:before{
+    position:absolute;
+    content: '';
+    height: 15px;
+    width: 15px;
+    background:#1b1b1b;
+    right: 11px;
+    top: -5px;
+    transform: rotate(45deg);
+    z-index: 0;
+}
+
+.dropdownChoice li{
+    color:white;
+    line-height: 40px;
+    padding: 5px 20px;
+    cursor: pointer;
+}
+
+.dropdownChoice ul li label{
+    font-size: 25px;
+}
+
+.dropdownChoice ul{
+    position:absolute;
+    background: #1b1b1b;
+    list-style: none;
+    padding-inline-start: 10;
+    padding-left: 0px;
+    width: 100%;
+    left: 0;
+    border-radius: 10px;
+    display: none;
+}
+
+[id^=btn]:checked + ul{
+    display:block;
+}
+
+.dropdownChoice ul li {
+    color:white;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+    text-align: left;
+}
+
+.dropdownChoice ul ul{
+    position: static;
+}
+
+.dropdownChoice ul ul li{
+    line-height: 20px;
+    padding-left: 15px;
+    border-bottom: none;
+}
+
+.dropdownChoice ul li span{
+    float:right;
+    position:absolute;
+    left:85%;
+    margin-top: 12px;
+}
+
+.dropdownChoice ul li:hover{
+    color:cyan;
+}
+
+.dropdownChoice input{
+    display: none;
+}
+
+ul.menu{
+    z-index: 1;
+}

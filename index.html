@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script
+      type="text/javascript"
+      src="./node_files/generate_jsons.cjs"
+    ></script>
+    <script
+      type="text/javascript"
+      src="./node_files/generation_functions.cjs"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="module" src="./index.js"></script>
+    <script type="module" src="./Calculations.js"></script>
+    <script type="module" src="./variables.js"></script>
+    <script type="module" src="./Structures.js"></script>
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="dropdown.css" />
+  </head>
+
+  <body>
+    <h1>Alloy Graphs by yjzhou</h1>
+    <div id="chart_div"></div>
+    <p></p>
+    <div id="chart2_div"></div>
+
+    <!-- Dropdown for Immortal -->
+    <div class="dropdownChoice dropdownImmortal">
+      <label for="btn-Immortal" class="button" id="immortal">
+        Immortal
+        <span class="arrow down"></span>
+      </label>
+      <input type="checkbox" class="dropdownHeading" id="btn-Immortal" />
+      <ul class="menu">
+        <li>
+          <label for="btn-Qrath" class="first"
+            >Q'rath
+            <span class="arrow down"></span>
+          </label>
+          <input type="checkbox" name="faction" id="btn-Qrath" />
+          <ul>
+            <li>Ajari</li>
+            <li>Orzum</li>
+          </ul>
+        </li>
+
+        <li>
+          <label for="btn-Aru" class="second">
+            Aru
+            <span class="arrow down"></span>
+          </label>
+          <input type="checkbox" name="faction" id="btn-Aru" />
+          <ul>
+            <li>Xol</li>
+            <li>Mala</li>
+          </ul>
+        </li>
+
+        <li>
+          <label for="btn-Jora" class="third">
+            Jora
+            <span class="arrow down"></span>
+          </label>
+          <input type="checkbox" name="faction" id="btn-Jora" />
+          <ul>
+            <li>Dekker</li>
+            <li>N.A.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="grid-container">
+      <div class="action">
+        <div class="action_header">Main Base: Grove Heart</div>
+        <div class="flexbox-container">
+          <div class="action_image">
+            <img class="symbiote_walk" src="" alt="" />
+            <img
+              class="structure_unit"
+              src="images/aru/structures/GroveHeart.png"
+              alt=""
+            />
+            <div class="icon_tooltip"></div>
+          </div>
+          <div class="action_icons">
+            <div class="top_images">
+              <img
+                src="images\action_icons\Time.svg"
+                alt=""
+                class="icon time_icon"
+              />
+              <img
+                src="images\action_icons\Healthv2.svg"
+                alt=""
+                class="icon health_icon"
+              />
+              <img
+                src="images\action_icons\Alloy.svg"
+                alt=""
+                class="icon alloy_icon"
+              />
+              <img
+                src="images\action_icons\Ether.svg"
+                alt=""
+                class="icon ether_icon"
+              />
+
+              <img
+                src="images\action_icons\All.svg"
+                alt=""
+                class="icon all_icon"
+              />
+            </div>
+
+            <div class="bottom_images">
+              <img
+                src="images\action_icons\Worker.svg"
+                alt=""
+                class="icon worker_icon"
+              />
+              <img
+                src="images\action_icons\Unlock.svg"
+                alt=""
+                class="icon unlock_icon"
+              />
+              <img
+                src="images\action_icons\Upgrade.svg"
+                alt=""
+                class="icon upgrade_icon"
+              />
+              <img
+                src="images\action_icons\Cancel.svg"
+                alt=""
+                class="icon cancel_icon"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="action_initial">
+          <img src="images\action_icons\start.svg" alt="" /><b
+            >8/8 workers, level 2, 8000 alloy</b
+          >
+        </div>
+        <div class="action_current">
+          <img src="images\action_icons\now.svg" alt="" /><b
+            >7/8 workers, level 2, 7830 alloy</b
+          >
+        </div>
+      </div>
+
+      <!-- <img src="images\aru\structures\symbiote_right.gif" alt=""> -->
+      <img src="images\action_icons\right_arrow.svg" alt="" />
+
+      <div class="action" id="actionChoice">
+        <div class="action_header">
+          <div class="next_action_container dropdownChoice">
+            <label for="btn-action" id="action">
+              Next Action <span class="arrow down" id="actionArrow"></span>
+            </label>
+            <input type="checkbox" class="dropdownHeading" id="btn-action" />
+            <ul class="menu"></ul>
+          </div>
+        </div>
+
+        <div class="flexbox-container">
+          <div class="action_image">
+            <h1>No action currently selected</h1>
+            <img
+              src="images\action_icons\confused_symbiote.gif"
+              id="confused_symbiote"
+              alt=""
+            />
+          </div>
+
+          <div class="action_icons">
+            <div class="top_images">
+              <img src="images\action_icons\Time.svg" alt="" />
+              <img src="images\action_icons\Healthv2.svg" alt="" />
+              <img src="images\action_icons\Alloy.svg" alt="" />
+              <img src="images\action_icons\Ether.svg" alt="" />
+
+              <img src="images\action_icons\All.svg" alt="" />
+            </div>
+
+            <div class="bottom_images">
+              <img src="images\action_icons\Question.svg" alt="" />
+              <img src="images\action_icons\Unlock.svg" alt="" />
+              <img src="images\action_icons\Upgrade.svg" alt="" />
+              <img src="images\action_icons\Cancel.svg" alt="" />
+            </div>
+          </div>
+        </div>
+        <div class="action_initial"><b>Initial Properties:</b></div>
+        <div class="action_current"><b>Current Properties:</b></div>
+      </div>
+    </div>
+
+    <script type="module" src="./user_interaction.js"></script>
+  </body>
+</html>
