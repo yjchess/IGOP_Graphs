@@ -145,7 +145,7 @@ var fs = require('fs');
 
 function createFile(name, file){
     var fileContent = beautify_JSON_Obj_Arr(file);
-    var filepath = "./json_files/"+name+".json";
+    var filepath = "./Backend/json_files/"+name+".json";
     
     fs.writeFileSync(filepath, fileContent, (err) => {
         if (err) throw err;

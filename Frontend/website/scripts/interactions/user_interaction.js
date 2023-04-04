@@ -1,7 +1,7 @@
 
-import { check_unlocked, addStructureToHash } from "./Structures.js";
-import { potentialBuildTime, getBuildingVariables } from "./Calculations.js";
-import { BUILDINGVARIABLES } from "./variables.js";
+import { check_unlocked, addStructureToHash } from "../calculations/Structures.js";
+import { potentialBuildTime, getBuildingVariables } from "../calculations/Calculations.js";
+import { BUILDINGVARIABLES } from "../calculations/variables.js";
 
 // Determines Immortal Selected
 const IMMORTAL_DROPDOWN = document.querySelector("#immortal");
