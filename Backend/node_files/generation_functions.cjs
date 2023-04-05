@@ -22,7 +22,7 @@ function defense(air, ground){
             groundLightDPS: ground[0],  groundMediumDPS: ground[1],  groundHeavyDPS: ground[2],  groundDmgRange: ground[3], groundDmgCD: ground[4]};
 }
 
-function specific_properties(object){
+function specific_properties_key(object){
     let type = object.type;
     let property = (type.toString().charAt(0).toUpperCase() + type.toString().slice(1));    
     return(property);
@@ -32,10 +32,10 @@ function texts(object){
     let description = "";
 
     // Reduce object.type.property to obj.property i.e. object.base.worker becomes obj.worker
-    let obj = object[specific_properties(object)];
+    let obj = object[specific_properties_key(object)];
     let array = undefined;
 
-    if(specific_properties(object)==="Upgrade"){array = obj.unitUnlocks.join(", ");}
+    if(specific_properties_key(object)==="Upgrade"){array = obj.unitUnlocks.join(", ");}
     let startTexts={
         Base: (obj.workers + "/" + obj.workerInitMax + " workers, level " + obj.level + ", " + obj.alloyInitAmount + " Alloy"),
         Ether: (obj.initAmount + " ether, + " + obj.gain + " every " + obj.increment + " seconds" ),
@@ -45,7 +45,7 @@ function texts(object){
         Defense:("air/ground:" + obj.airLightDPS + "/" + obj.airMediumDPS + "/" + obj.airHeavyDPS + " " + obj.groundLightDPS + "/" + obj.groundMediumDPS + "/" + obj.groundHeavyDPS +"dps"),
         Upgrade:("0/"+obj.initUpTotal + " up unlock: "+ array)
     };    
-    return ({startText: startTexts[specific_properties(object)], description:description});
+    return ({startText: startTexts[specific_properties_key(object)], description:description});
 }
 
 function fileRef(object){
@@ -57,70 +57,33 @@ function fileRef(object){
     return {img: "images/aru/structures/"+imgName+".png", icon:"images/action_icons/"+iconName+".svg"};
 }
 
-function stats(health, shield, armour){
-    if(armour){return{health: health, shields: shield, armour:armour}}
-    return {health: health, shields: shield, armour:"Heavy"};
-}
+function stats(health, shield, armour){return {health: health, shields: shield, armour: armour===undefined?"Heavy" :armour};}
 
 
-function post_processing(){
-
-}
-// BUILDINGVARIABLES.forEach(building =>{
-//     let reqArr=building.techTree.require;
-//     let reqAltArr=building.techTree.requireAlt;
-//     if(reqArr !==null){
-//         if(reqArr.length ===1){BUILDINGVARIABLES.forEach(option => {if(option.name === reqArr[0]){option.techTree.unlocks.push( building.name);};});}
-//         else if (reqArr.length > 1){BUILDINGVARIABLES.forEach(option => {reqArr.forEach(requirement =>{if(option.name === requirement){option.techTree.unlockCombo.push([reqArr,building.name])}})})};
-//     }
-
-//     if(reqAltArr !==null){
-//         if(reqAltArr.length ===1){BUILDINGVARIABLES.forEach(option => {if(option.name === reqAltArr[0]){option.techTree.unlocks.push( building.name);};});}
-//         else if (reqAltArr.length > 1){BUILDINGVARIABLES.forEach(option => {reqAltArr.forEach(requirement =>{if(option.name === requirement){option.techTree.unlockCombo.push([reqAltArr,building.name])}})})};
-//     }
-
-// });
-
-
-// BUILDINGVARIABLES.forEach(building =>{
-//     building.files = fileRef(building);
-//     building.texts = texts(building);
-//     if(building.techTree.unlocks.length === 0){ building.techTree.unlocks = null};
-//     if(building.techTree.unlockCombo.length === 0){ building.techTree.unlockCombo = null};  
-// });
-
-
-// Code Regarding File Creation Starts here
-function beautify_JSON_Obj_Arr(array){
-    // let propertiesHash = newMap();
-    let modified = JSON.stringify(array).replaceAll("},{","},\n\t{");
-    modified = modified.slice(1,-1);
-    modified = "[\n\t" + modified + "\n]";
-
-    // let property_regex =/(\"(([a-z])+(([A-Z])*([a-z])+)*)+\":)/g;
-    let property_regex =/(\"\w+\":)/g; 
-    let all_properties = modified.match(property_regex);
-    let matching_properties = [];
-    const elementCounts = {};
-    all_properties.forEach(element => {
-        elementCounts[element] = (elementCounts[element] || 0) + 1;
-        if (elementCounts[element] === array.length){matching_properties.push(element)}
+function post_processing(buildingvariables, unitvariables){
+    buildingvariables.forEach(building =>{
+        let reqArr=building.techTree.require;
+        let reqAltArr=building.techTree.requireAlt;
+        if(reqArr !==null){
+            if(reqArr.length ===1){buildingvariables.forEach(option => {if(option.name === reqArr[0]){option.techTree.unlocks.push( building.name);};});}
+            else if (reqArr.length > 1){buildingvariables.forEach(option => {reqArr.forEach(requirement =>{if(option.name === requirement){option.techTree.unlockCombo.push([reqArr,building.name])}})})};
+        }
+    
+        if(reqAltArr !==null){
+            if(reqAltArr.length ===1){buildingvariables.forEach(option => {if(option.name === reqAltArr[0]){option.techTree.unlocks.push( building.name);};});}
+            else if (reqAltArr.length > 1){buildingvariables.forEach(option => {reqAltArr.forEach(requirement =>{if(option.name === requirement){option.techTree.unlockCombo.push([reqAltArr,building.name])}})})};
+        }
+    
+    });
+    
+    
+    buildingvariables.forEach(building =>{
+        building.files = fileRef(building);
+        building.texts = texts(building);
+        if(building.techTree.unlocks.length === 0){ building.techTree.unlocks = null};
+        if(building.techTree.unlockCombo.length === 0){ building.techTree.unlockCombo = null};  
     });
 
-    matching_properties.forEach(property =>{
-        let value_regex = new RegExp('('+property+')(.+?)(\\"\\w+\\":)',"g");
-        let longest = 0;
-        
-        for(const match of modified.matchAll(value_regex)){if(match[2].length > longest){longest = match[2].length}}
-
-        for(const match of modified.matchAll(value_regex)){
-            let whitespaces = (longest-match[2].toString().length)+1;
-            let string_to_be_replaced = match[1] + match[2] + match[3];
-            let replacement_string = (match[1] + " ".repeat(whitespaces) + match[2] + " "+match[3]);
-            modified = modified.replace(string_to_be_replaced, replacement_string);
-        }
-    })
-    return (modified);
 }
 
-module.exports ={techTree, costs, base, ether, barracks, factory, starport, upgrade, defense, specific_properties, texts, fileRef, stats, beautify_JSON_Obj_Arr};
+module.exports ={techTree, costs, base, ether, barracks, factory, starport, upgrade, defense, texts, fileRef, stats, post_processing};

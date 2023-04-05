@@ -4,10 +4,11 @@ require("./generate_jsons.cjs")
 
 const { contentType, lookup } = require("mime-types");
 const port = 3000
-
+console.log(Math.random());
 const { dirname } = require('path');
 const appDir = dirname(require.main.filename);
 console.log(appDir);
+
 
 const server = http.createServer(function(req, res) {
     if(req.url === "/")
@@ -22,7 +23,6 @@ const server = http.createServer(function(req, res) {
 function serveFile(file, res){
 
     fs.readFile(`Frontend/website/${file}`, function(error, data){
-        console.log(file);
         if(error){
             res.writeHead(404);
             res.write('Error file not found');

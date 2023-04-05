@@ -274,10 +274,10 @@ function toolTipContent(iconName, iconToolTip){
         <div class="flexbox-container-vertical">
             <h1 class = header>Time</h1>
             <div class="flexbox-container-vertical grow">
-                <h3>Build Duration: <p class = "alloy_colour"> 1:40</p></h3>
-                <h3>Current Time: <p class = "alloy_colour"> 1:00</p></h3>
-                <h3>Start:<span class="START"> 0:00 </span> End: <span class="END"> 0:00</span></h3>
-                <h3>Upgrade Time:<span class="START"> 0:36 </span></h3>
+                <h3>Build Duration: <p class = "alloy_colour build_duration"> 1:40</p></h3>
+                <h3>Current Time: <p class = "alloy_colour current_time"> 1:00</p></h3>
+                <h3>Start:<span class="START start_time"> 0:00 </span> End: <span class="END end_time"> 0:00</span></h3>
+                <h3>Upgrade Time:<span class="START upgrade_time"> 0:36 </span></h3>
                 <h3>Build Worker:<span class="START"> 0:18 </span></h3>
             </div>
         </div>

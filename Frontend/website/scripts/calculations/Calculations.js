@@ -29,8 +29,6 @@ function CalculateWorkers(level, workers){ //for any given base, calculates how 
 
 //Calculates a pattern which predicts how much alloy is returned by workers on a base. i.e. 8 workers give: 5 alloy on second 1, 5 alloy on second 2 and 10 alloy on second 3 repeating.
 function CalculatePattern( long_workers, short_workers) {
-
-
   let calculation = ((long_workers / model.time_per_long_trip) + (short_workers / model.time_per_short_trip)) * model.alloy_per_trip;
   let count = 1;
   while ((calculation * count) % model.alloy_per_trip != 0 && (Math.trunc(calculation * count) != (calculation * count) - 0.99999999999999)) {
