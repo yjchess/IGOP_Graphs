@@ -81,7 +81,7 @@ function beautify_JSON_Obj_Arr(array){
 
 //Creation of file
 function createFile(name, fileContent){    
-    var filepath = `./Backend/json_files/${name}.json`;
+    var filepath = `./models/${name}.json`;
     
     fs.writeFileSync(filepath, fileContent, (err) => {
         if (err) throw err;

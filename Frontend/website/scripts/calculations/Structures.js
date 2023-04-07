@@ -1,7 +1,7 @@
-import { alloy_per_worker, getCumulativeAlloy, Change_Cumulative_Values} from './variables.js';
+import { alloy_per_worker, getCumulativeAlloy, Change_Cumulative_Values, bastion_time} from './variables.js';
 import { CalculateWorkers, CalculatePattern } from './Calculations.js';
 import { worker_build_time, nodes, BUILDINGVARIABLES, UNITVARIABLES} from "./variables.js";
-import { bases, ethers, staticD, armyStructures, upgradeStructures, allStructures } from './variables.js';
+import { bases, ethers, staticD, armyStructures, upgradeStructures, allStructures, bastion_timeout, bastion_amount } from './variables.js';
 
 
 //testing purposes
@@ -141,7 +141,8 @@ export class Base extends Structures{
         
         this.paused = []; //array of seconds paused
         this.worker_progress = 0; //progress of a building worker
-        this.built = false;  
+        this.built = false
+        this.mined_out = undefined;  
     }
 
     alloy(time) {
@@ -154,6 +155,7 @@ export class Base extends Structures{
             return(pattern[((time-1) -this.finished) % pattern.length]);
         }
         else{
+            if(this.base_alloy <5 && this.mined_out===undefined){this.mined_out = time;}
             return(0);
         }
 
@@ -179,6 +181,20 @@ export class Base extends Structures{
 
     }
 
+    calculateAlloyOutput(time){
+        return(this.alloy(time));
+    }
+
+    calculateAlloyAverage(time){
+        if(time<this.mined_out){return(this.long_workers*(5/6)+this.short_workers*(5/4))}
+        return(0);
+
+    }
+
+    getBaseAlloy(time){
+        
+    }
+
     pause_workers(start_time, end_time){
         
     }
@@ -193,6 +209,32 @@ export class Base extends Structures{
 
     
 }
+
+export class Bastion extends Structures{
+    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal, status){
+        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+        this.status = status;
+    }
+    calculateAlloyOutput(time){
+        if(this.status === "alive" && time < bastion_timeout && time!=0){
+            if(time % bastion_time  ==0){
+                return(bastion_amount)
+            }
+        }
+        return(0);
+    }
+    
+    calculateAlloyAverage(time){
+        if(this.status === "alive" && time < bastion_timeout && time >2){
+            return (bastion_amount/bastion_time);
+        }
+        else{
+            return(0);
+        }
+    }
+}
+
+export const bastion = new Bastion( "Bastion",0,0,0,0,0,"Xol", "alive");
 
 export function newGroveHeart(time_started, workers, level){
 
@@ -219,62 +261,6 @@ export function newAmberWomb(time_started){
     
 }
 
-export function check_unlocked_aru_structures(){ //This function is called to check the unlocked structures for all Aru immortals
-    let unlocked = [GROVEHEART]
-    
-    if(allStructures.get(GROVEHEART) > 0 || allStructures.get(GODHEART) > 0){unlocked.push(ALTAR, ETHER_MAW);}
-    if(allStructures.get(ALTAR) > 0){unlocked.push(NEUROCYTE, MURDER_HOLLOW, GODHEART);}
-    if(allStructures.get(GODHEART) > 0){unlocked.push(AMBER_WOMB, BONE_CANOPY);}
-    if(allStructures.get(GODHEART) > 0 &&  allStructures.get(ALTAR) > 0){unlocked.push(RED_VALE);}
-    if(allStructures.get(BONE_CANOPY) > 0){unlocked.push(DEEPNEST);}
-
-    unlocked.push(AEROVORE, OMNIVORE);
-    return (unlocked);
-
-}
-
-export function check_unlocked_units(){ //This function is called to check the unlocked structures for all Aru immortals
-    let unlocked = [];
-
-        UNITVARIABLES.forEach(unit => {
-            let tech = unit.techTree;
-            if (tech.require === null){unlocked.push(unit.name);}
-            else {
-                let unitReq = true;
-                tech.require.forEach(requirement => {if(allStructures.get(requirement) <=0){unitReq = false;}});
-                if(unitReq === true){unlocked.push(unit.name);}
-    
-                else if(tech.requireAlt!==null){
-                    tech.requireAlt.forEach(requirement => {if(allStructures.get(requirement) <=0){unitReq = false;}});
-                    if(buildReq === true){unlocked.push(building.name);}
-                }
-            }
-        });
-
-    return (unlocked);
-}
-
-// export function check_unlocked_structures(){ //This function is called to check the unlocked structures for all Aru immortals
-//     let unlocked = [];
-//     BUILDINGVARIABLES.forEach(building => {
-//         let tech = building.techTree;
-//         if (tech.require === null){unlocked.push(building.name);}
-
-//         else {
-//             let buildReq = true;
-//             tech.require.forEach(requirement => {if(allStructures.get(requirement) <=0){buildReq = false;}});
-//             if(buildReq === true){unlocked.push(building.name);}
-
-//             else if(tech.requireAlt!==null){
-//                 tech.requireAlt.forEach(requirement => {if(allStructures.get(requirement) <=0){buildReq = false;}});
-//                 if(buildReq === true){unlocked.push(building.name);}
-//             }
-//         }
-//     });
-
-//     return (unlocked);
-// }
-
 export function check_unlocked(type){
     let unlocked = [];
     let variables = [];
@@ -299,40 +285,6 @@ export function check_unlocked(type){
     return (unlocked);
 }
 
-export function check_unlocked_xol(){
-    let unlocked = check_unlocked_structures();
-
-    //check if the user has more than 0 of the following buildings
-    let altar = allStructures.get(ALTAR) > 0;               
-    let neurocyte = allStructures.get(NEUROCYTE) > 0;
-    let murder_hollow = allStructures.get(MURDER_HOLLOW) >0;
-    let red_vale = allStructures.get(RED_VALE) > 0;
-
-    let amber_womb = allStructures.get(AMBER_WOMB) > 0;
-    let godheart = allStructures.get(GODHEART) > 0;
-
-    let bone_canopy = allStructures.get(BONE_CANOPY) > 0;
-    let deepnest = allStructures.get(DEEPNEST) >0;
-
-
-    //Altar of the Worthy Units: If the building exists, add the unlocked units to the array 
-    if(altar){unlocked.push("Bone Stalkers");}
-    if(altar && neurocyte){unlocked.push("Xacal","Underspine");}
-    if(altar && murder_hollow){unlocked.push("Ichor");}
-    if(altar && red_vale){unlocked.push("White Wood Reapers");}
-    if(altar &&  neurocyte && red_vale){unlocked.push("Red Seer");}
-
-    //Amber Womb Units
-    if(amber_womb && godheart){unlocked.push("Wraith Bow");}
-    if(amber_womb && godheart && neurocyte){unlocked.push("Resinant");}
-
-    //Bone Canopy Units
-    if(bone_canopy){unlocked.push("Thrums");}
-    if(bone_canopy && neurocyte){unlocked.push("Aarox");}
-    if(bone_canopy && neurocyte && deepnest){unlocked.push("Behemoth");}
-
-    return (unlocked);
-}
 
 
 export function modelBuildings(){
