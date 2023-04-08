@@ -1,3 +1,4 @@
+console.log("I am graphCalculationUtils.js")
 import {bastion} from "../Structures.js"
 import {bases} from "../variables.js"
 
@@ -88,4 +89,14 @@ export function CalculateAverageAlloy(time){
     
     total += bastion.calculateAlloyAverage(time);
     return total;
+}
+
+export function calculateTicksArray(length, ticks_interval){
+    let ticks_array=[];
+    for (let i=0; i<= length; i++){
+        if (i % ticks_interval == 0){
+          ticks_array.push({v:i, f:Convert_To_Minute(i)});
+      }
+    }
+    return ticks_array;
 }

@@ -2,7 +2,8 @@
   "name": "igop_graphs",
   "version": "1.0.0",
   "description": "",
-  "main": "C:\\Users\\Spoderman\\IGOP_Graphs\\Backend\\node_files\\App.js",
+  "main": "./Backend/App.js",
+  "exports": { "./*" : "./Backend"},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

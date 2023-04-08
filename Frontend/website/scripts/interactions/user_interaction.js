@@ -1,7 +1,6 @@
-
 import { check_unlocked, addStructureToHash } from "../calculations/Structures.js";
-import { potentialBuildTime, getBuildingVariables } from "../calculations/Calculations.js";
-import { BUILDINGVARIABLES } from "../calculations/variables.js";
+import { potentialBuildTime } from "../calculations/Calculations.js";
+import { getBuildingVariables } from "../calculations/utils/variableGetUtils.js";
 
 // Determines Immortal Selected
 const IMMORTAL_DROPDOWN = document.querySelector("#immortal");
@@ -114,7 +113,7 @@ function createActionCard(actionName){
           <img src="images/action_icons/start.svg" alt=""><b>`+building.texts.startText+`</b>
         </div>
         <div class="action_current">
-          <img src="images/action_icons/now.svg" alt=""><b>`+building.startText+`</b>
+          <img src="images/action_icons/now.svg" alt=""><b>`+building.texts.startText+`</b>
         </div>
       </div>
       <img src="images/action_icons/right_arrow.svg" alt="">
@@ -126,7 +125,7 @@ function possibleActionsList(type){
     let unlocked = check_unlocked(type);
     let possible = '';
     unlocked.forEach(actionName => {
-        let time = potentialBuildTime(actionName, "building");
+        let time = potentialBuildTime(actionName, type);
         if (time !== undefined){
             possible+=
             `

@@ -7,6 +7,7 @@ function costs(alloy, ether, time, supply){
 
 
 // These Functions are for Specific types of Buildings.
+function bastion(tickAmount, tickDuration, timeout){return {amount:tickAmount, time:tickDuration, timeout:timeout}}
 function base(workers, workerMax, level, alloy){return {workers:workers, workerInitMax:workerMax, level:level, alloyInitAmount:alloy};}
 function ether(amount, gain, increment){return {initAmount:amount, gain:gain, increment:increment};}
 var barracks, factory, starport; //These are the same function but w different names
@@ -86,4 +87,4 @@ function post_processing(buildingvariables, unitvariables){
 
 }
 
-module.exports ={techTree, costs, base, ether, barracks, factory, starport, upgrade, defense, texts, fileRef, stats, post_processing};
+module.exports ={techTree, costs, bastion, base, ether, barracks, factory, starport, upgrade, defense, texts, fileRef, stats, post_processing};

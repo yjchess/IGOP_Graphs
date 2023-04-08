@@ -1,52 +1,29 @@
-import { alloy_per_worker, getCumulativeAlloy, Change_Cumulative_Values, bastion_time} from './variables.js';
+console.log("I am Structures.js")
+import { CONSTANTS as g} from './variables.js';
 import { CalculateWorkers, CalculatePattern } from './Calculations.js';
-import { worker_build_time, nodes, BUILDINGVARIABLES, UNITVARIABLES} from "./variables.js";
-import { bases, ethers, staticD, armyStructures, upgradeStructures, allStructures, bastion_timeout, bastion_amount } from './variables.js';
+import { bases, ethers, armyStructures, allStructures} from './variables.js';
+import { Change_Cumulative_Values } from './utils/variableSetUtils.js';
+import { getCumulativeAlloy, getUnitVariables, getBuildingVariables } from './utils/variableGetUtils.js';
 
-
+import {GROVEHEART, ETHER_MAW, ALTAR, MURDER_HOLLOW, NEUROCYTE, RED_VALE, AMBER_WOMB, BONE_CANOPY, DEEPNEST, GODHEART, AEROVORE, OMNIVORE, GUARDIAN} from "./variables.js"
+import { Graph_Values } from './graphCalculations.js';
 //testing purposes
-import { values2 } from './variables.js';
-
-export const [GROVEHEART, ETHER_MAW, ALTAR, MURDER_HOLLOW, NEUROCYTE, RED_VALE, AMBER_WOMB, BONE_CANOPY, DEEPNEST, GODHEART, AEROVORE, OMNIVORE, GUARDIAN] 
-= ["GroveHeart","Ether Maw", "Altar Of The Worthy", "Murder Hollow", "Neurocyte","Red Vale", "Amber Womb", "Bone Canopy", "Deepnest", "GodHeart", "Aerovore", "Omnivore", "Guardian Of The Grove"];
-
-export const[SYMBIOTE, BONESTALKER, UNDERSPINE, XACAL, ICHOR, REDSEER, WWR, WRAITHBOW, RESINANT, AAROX, THRUM, BEHEMOTH]
-=["Symbiote","Bone Stalker", "Underspine", "Xacal", "Ichor", "Red Seer", "White Wood Reaper", "Wraith Bow", "Resinant", "Aarox", "Thrum", "Behemoth"]
-
-export function createAllStructuresHash(faction){
-    let tempHash = new Map();
-    if(faction === "Aru"){
-        tempHash.set(GROVEHEART,0);
-        tempHash.set(ETHER_MAW,0);
-        tempHash.set(ALTAR,0);
-        tempHash.set(NEUROCYTE,0);
-        tempHash.set(MURDER_HOLLOW,0);
-        tempHash.set(RED_VALE,0);
-        tempHash.set(AMBER_WOMB,0);
-        tempHash.set(BONE_CANOPY,0);
-        tempHash.set(DEEPNEST,0);
-        tempHash.set(GODHEART,0);
-        tempHash.set(AEROVORE,0);
-        tempHash.set(OMNIVORE,0);
-        tempHash.set(GUARDIAN,0);
-    }
-    return(tempHash)
-}
 
 export function addStructureToHash(structureName){
     allStructures.set(structureName, (allStructures.get(structureName) + 1));
 }
-
-
 class Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal){
+    constructor(name, time_started, unlocked_time, immortal){
         this.name = name;
-        this.alloy_cost = alloy_cost;
-        this.ether_cost = ether_cost;
-        this.build_time = build_time;
+        this.building = getBuildingVariables(name)
+        this.alloy_cost = this.building.costs.alloy;
+        this.ether_cost = this.building.costs.ether;
+        this.build_time = this.building.costs.time;
         this.time_started = time_started;
         this.unlocked_time = unlocked_time; //Time building becomes unlocked
         this.immortal = immortal; //Array of immortals that can build this building
+        allStructures.set(this.name, allStructures.get(this.name)+1);
+        this.build_self(time_started)
 
     }
 
@@ -68,15 +45,15 @@ class Structures{
     }
 
     build_self(time){ //simple takes the alloy cost away from the cumulative graph
-
         if(this.time_started != -100 && this.built ==false && time == this.time_started) { //-100 seconds is the time for the first base to be created
-
+            console.log("building self")
             Change_Cumulative_Values(this.time_started, - this.alloy_cost);
             allStructures.set(this.name, allStructures.get(this.name)+1);
             this.built = true;
         }
 
         if(this.time_started === -100){
+            console.log("building self")
             allStructures.set(this.name, allStructures.get(this.name)+1);
         }
     }
@@ -86,9 +63,40 @@ class Structures{
     }
 }
 
+class Bastion extends Structures{
+    constructor(name, time_started, unlocked_time, immortal, status){
+        super(name, time_started, unlocked_time, immortal);
+        this.bastion_time = this.building.Bastion.time
+        this.bastion_amount = this.building.Bastion.amount
+        this.bastion_timeout = this.building.Bastion.timeout
+        this.status = status;
+        this.built = true;
+    }
+    calculateAlloyOutput(time){
+        if(this.status === "alive" && time < this.bastion_timeout && time!=0){
+            if(time % this.bastion_time  ==0){
+                return(this.bastion_amount)
+            }
+        }
+        return(0);
+    }
+    
+    calculateAlloyAverage(time){
+        if(this.status === "alive" && time < this.bastion_timeout && time >2){
+            return (this.bastion_amount/this.bastion_time);
+        }
+        else{
+            return(0);
+        }
+    }
+}
+export const bastion = new Bastion( "Bastion",0,0,"Xol", "alive");
+
+
+
 class UpgradeStructure extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+    constructor(name, time_started, unlocked_time, immortal){
+        super(name, time_started, unlocked_time, immortal);
         
         this.finished = time_started + this.build_time;        
         this.built = false;  
@@ -96,8 +104,8 @@ class UpgradeStructure extends Structures{
 }
 
 class ArmyStructure extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+    constructor(name, time_started, unlocked_time, immortal){
+        super(name, time_started, unlocked_time, immortal);
         
         this.finished = time_started + this.build_time;        
         this.built = false;  
@@ -109,8 +117,8 @@ class ArmyStructure extends Structures{
 }
 
 class StaticDefense extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+    constructor(name, time_started, unlocked_time, immortal){
+        super(name, time_started, unlocked_time, immortal);
         
         this.finished = time_started + this.build_time;        
         this.built = false;  
@@ -118,8 +126,8 @@ class StaticDefense extends Structures{
 }
 
 class EtherStructure extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+    constructor(name, time_started, unlocked_time, immortal){
+        super(name, time_started, unlocked_time, immortal);
         
         this.finished = time_started + this.build_time;        
         this.built = false;  
@@ -128,14 +136,14 @@ class EtherStructure extends Structures{
 }
 
 export class Base extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal, workers, level){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
+    constructor(name, time_started, unlocked_time, immortal, workers, level){
+        super(name, time_started, unlocked_time, immortal);
         this.base_alloy = 8000;
         this.workers = workers;
         this.level = level;
         this.time_started = time_started;
         this.finished = time_started + this.build_time;
-        this.nodes = nodes; //Total Nodes (not just nodes unlocked)
+        this.nodes = g.nodes; //Total Nodes (not just nodes unlocked)
         this.long_workers = CalculateWorkers(this.level, this.workers)[0];
         this.short_workers = CalculateWorkers(this.level, this.workers)[1];
         
@@ -145,31 +153,15 @@ export class Base extends Structures{
         this.mined_out = undefined;  
     }
 
-    alloy(time) {
-        if(this.base_alloy >0 && time !=0){
-            this.long_workers = CalculateWorkers(this.level, this.workers)[0];
-            this.short_workers = CalculateWorkers(this.level, this.workers)[1];
-            let pattern = CalculatePattern(this.long_workers, this.short_workers); //calculate every second as this may change
-            //note time - 1 is used as arrays start at 0
-            this.base_alloy -= pattern[((time-1) -this.finished) % pattern.length];
-            return(pattern[((time-1) -this.finished) % pattern.length]);
-        }
-        else{
-            if(this.base_alloy <5 && this.mined_out===undefined){this.mined_out = time;}
-            return(0);
-        }
-
-    }
-
     build_workers(time){
-        if(this.paused.includes(time) == false && this.workers < this.level*this.nodes && getCumulativeAlloy(time)>(alloy_per_worker/worker_build_time) && this.finished <time){
+        if(this.paused.includes(time) == false && this.workers < this.level*this.nodes && getCumulativeAlloy(time)>(g.alloyPerTrip/g.workerBuildTime) && this.finished <time){
             
-            if (this.worker_progress != worker_build_time){ //when the worker has been built for 18 seconds, the base pops out a worker and may build a new worker
+            if (this.worker_progress != g.workerBuildTime){ //when the worker has been built for 18 seconds, the base pops out a worker and may build a new worker
                 this.worker_progress += 1;
 
                 
-                Change_Cumulative_Values( time, - (alloy_per_worker/worker_build_time));
-                if(this.worker_progress == worker_build_time){
+                Change_Cumulative_Values( time, - (g.alloyPerWorker/g.workerBuildTime));
+                if(this.worker_progress == g.workerBuildTime){
                     this.workers += 1;
 
                 }
@@ -182,7 +174,18 @@ export class Base extends Structures{
     }
 
     calculateAlloyOutput(time){
-        return(this.alloy(time));
+        if(this.base_alloy >0 && time !=0){
+            this.long_workers = CalculateWorkers(this.level, this.workers)[0];
+            this.short_workers = CalculateWorkers(this.level, this.workers)[1];
+            let pattern = CalculatePattern(this.long_workers, this.short_workers); //calculate every second as this may change
+            //note time - 1 is used as arrays start at 0
+            this.base_alloy -= pattern[((time-1) -this.finished) % pattern.length];
+            return(pattern[((time-1) -this.finished) % pattern.length]);
+        }
+        else{
+            if(this.base_alloy <5 && this.mined_out===undefined){this.mined_out = time;}
+            return(0);
+        }
     }
 
     calculateAlloyAverage(time){
@@ -210,35 +213,11 @@ export class Base extends Structures{
     
 }
 
-export class Bastion extends Structures{
-    constructor(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal, status){
-        super(name, alloy_cost, build_time, ether_cost, time_started, unlocked_time, immortal);
-        this.status = status;
-    }
-    calculateAlloyOutput(time){
-        if(this.status === "alive" && time < bastion_timeout && time!=0){
-            if(time % bastion_time  ==0){
-                return(bastion_amount)
-            }
-        }
-        return(0);
-    }
-    
-    calculateAlloyAverage(time){
-        if(this.status === "alive" && time < bastion_timeout && time >2){
-            return (bastion_amount/bastion_time);
-        }
-        else{
-            return(0);
-        }
-    }
-}
 
-export const bastion = new Bastion( "Bastion",0,0,0,0,0,"Xol", "alive");
 
 export function newGroveHeart(time_started, workers, level){
 
-    bases.push(new Base( GROVEHEART, 400, 100, 0, time_started, 0, 'Xol', workers, level));
+    bases.push(new Base( GROVEHEART, time_started, 0, 'Xol', workers, level));
     
 }
 
@@ -264,7 +243,7 @@ export function newAmberWomb(time_started){
 export function check_unlocked(type){
     let unlocked = [];
     let variables = [];
-    if(type ==="unit"){variables = UNITVARIABLES}else{variables = BUILDINGVARIABLES}
+    if(type ==="unit"){variables = getUnitVariables()}else{variables = getBuildingVariables()}
     variables.forEach(action => {
         let tech = action.techTree;
         if (tech.require === null){unlocked.push(action.name);}
@@ -291,4 +270,5 @@ export function modelBuildings(){
     newGroveHeart(-100,8,2);
     // newGroveHeart(22,0,2);
 }
-  
+
+modelBuildings();

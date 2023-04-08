@@ -1,6 +1,6 @@
 var path = require('path');
 
-const {techTree, costs, base, ether, barracks, factory, starport, upgrade, defense, texts, fileRef, stats, post_processing } = require(".\\generation_functions.cjs");
+const {techTree, costs, base, ether, barracks, factory, starport, upgrade, defense, texts, fileRef, stats, post_processing, bastion } = require(".\\generation_functions.cjs");
 const {beautify_JSON_Obj_Arr, createFile} = require("./json_file_functions.cjs") 
 
 const [GROVEHEART, ETHER_MAW, ALTAR, MURDER_HOLLOW, NEUROCYTE, RED_VALE, AMBER_WOMB, BONE_CANOPY, DEEPNEST, GODHEART, AEROVORE, OMNIVORE, GUARDIAN, BASTION] 
@@ -10,7 +10,7 @@ const [SYMBIOTE, BONESTALKER, UNDERSPINE, XACAL, ICHOR, REDSEER, WWR, WRAITHBOW,
 =["Symbiote","Bone Stalker", "Underspine", "Xacal", "Ichor", "Red Seer", "White Wood Reaper", "Wraith Bow", "Resinant", "Aarox", "Thrum", "Behemoth"]
 
 
-const ARUBUILDINGS ={
+const BUILDINGNAMES ={
     GROVEHEART:   "GroveHeart",
     ETHER_MAW:    "Ether Maw", 
     ALTAR:        "Altar Of The Worthy", 
@@ -26,7 +26,7 @@ const ARUBUILDINGS ={
     GUARDIAN:     "Guardian Of The Grove", 
     BASTION:      "Bastion",
 }
-const XOLUNITS = {
+const UNTINAMES = {
     SYMBIOTE:   "Symbiote", 
     BONESTALKER:"Bone Stalker", 
     UNDERSPINE: "Underspine", 
@@ -71,7 +71,7 @@ const BUILDINGVARIABLES = [
     {name:AEROVORE,      faction: "Aru", techTree:techTree(null,null),                type: "defense",  costs: costs(100, 0, 18),   stats:stats(300, 50),   files:undefined, texts:undefined, Defense:defense([24, 700, 1.639], ["00", "00", "00"] )},
     {name:OMNIVORE,      faction: "Aru", techTree:techTree(null,null),                type: "defense",  costs: costs(100, 0, 18),   stats:stats(400, 50),   files:undefined, texts:undefined, Defense:defense([24, 700, 1.639], [12, 14, 16, 700, 2.439])},
     {name:GUARDIAN,      faction: "Aru", techTree:techTree(null,null),                type: "defense",  costs: costs(100, 0, 18),   stats:stats(1200, 200), files:undefined, texts:undefined, Defense:defense([24, 39, 24, 700, 1.639], [12, 14, 16, 700, 2.439])},
-    {name:BASTION,       faction: "Aru", techTree:techTree(null,null),                type: "defense",  costs: costs(100, 0, 18),   stats:stats(1200, 200), files:undefined, texts:undefined, Defense:defense([24, 39, 24, 700, 1.639], [12, 14, 16, 700, 2.439])},
+    {name:BASTION,       faction: "Aru", techTree:techTree(null,null),                type: "bastion",  costs: costs(100, 0, 18),   stats:stats(1200, 200), files:undefined, texts:undefined, Bastion:bastion(20, 3, 900)},
 ];
 
 //Some properties reference other properties in the object and thus are initialized with null before being changed.
@@ -81,8 +81,14 @@ post_processing(BUILDINGVARIABLES);
 
 // Code Regarding File Creation Starts here
 let building_variable_content = beautify_JSON_Obj_Arr(BUILDINGVARIABLES)
+let building_name_content = JSON.stringify(BUILDINGNAMES, null, 2)
+
 let user_variable_content = beautify_JSON_Obj_Arr(UNITVARIABLES)
+let unit_name_content = JSON.stringify(UNTINAMES, null, 2)
 
 createFile("BUILDINGVARIABLES", building_variable_content);
 createFile("UNITVARIABLES", user_variable_content);
+
+createFile("BUILDINGNAMES", building_name_content);
+createFile("UNITNAMES", unit_name_content);
 

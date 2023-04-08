@@ -83,11 +83,10 @@ function beautify_JSON_Obj_Arr(array){
 function createFile(name, fileContent){    
     var filepath = `./models/${name}.json`;
     
-    fs.writeFileSync(filepath, fileContent, (err) => {
+    fs.writeFile(filepath, fileContent, (err) => {
         if (err) throw err;
+        else{console.log(`The ${name} file was succesfully saved!`);}
     
-        console.log(`The ${name} file was succesfully saved!`);
     });    
 }
-
 module.exports = {beautify_JSON_Obj_Arr, createFile}
